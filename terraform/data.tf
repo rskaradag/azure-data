@@ -4,8 +4,8 @@ resource "null_resource" "upload_csv" {
   provisioner "local-exec" {
     command = <<EOT
       az storage blob upload \
-        --account-name ${azurerm_storage_account.storage.name} \
-        --account-key ${data.azurerm_storage_account.storage_data.primary_access_key} \
+        --account-name ${azurerm_storage_account.rabo.name} \
+        --account-key ${data.azurerm_storage_account.raboData.primary_access_key} \
         --container-name ${azurerm_storage_container.container.name} \
         --name transactions.csv \
         --file ./data/records.csv \
@@ -14,7 +14,7 @@ resource "null_resource" "upload_csv" {
   }
 
   depends_on = [
-    azurerm_storage_account.storage,
+    azurerm_storage_account.rabo,
     azurerm_storage_container.container
   ]
 }

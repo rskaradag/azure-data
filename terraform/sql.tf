@@ -2,8 +2,8 @@
 # It uses the azurerm provider to create resources in Azure.
 resource "azurerm_mssql_server" "sql_server" {
   name                         = var.sqlserver_name
-  resource_group_name          = azurerm_resource_group.rg.name
-  location                     = azurerm_resource_group.rg.location
+  resource_group_name          = azurerm_resource_group.rabo.name
+  location                     = azurerm_resource_group.rabo.location
   version                      = "12.0"
   administrator_login          = "sqladminuser"
   administrator_login_password = var.sql_admin_password
@@ -26,6 +26,6 @@ resource "azurerm_mssql_firewall_rule" "allow_local" {
   name             = "AllowLocal"
   server_id        = azurerm_mssql_server.sql_server.id
   start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 }
 
