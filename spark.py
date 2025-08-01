@@ -1,10 +1,14 @@
 from pyspark.sql.functions import col, expr
-from notebookutils import mssparkutils
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
 
-sql_server   = mssparkutils.credentials.getSecret("kv-rabo", "SQL-SERVER")
-sql_database = mssparkutils.credentials.getSecret("kv-rabo", "SQL-DATABASE")
-sql_user     = mssparkutils.credentials.getSecret("kv-rabo", "SQL-USER")
-sql_password = mssparkutils.credentials.getSecret("kv-rabo", "SQL-PASSWORD")
+keyvault_url = "https://kv-rabo.vault.azure.net/"
+credential = DefaultAzureCredential()
+client = SecretClient(vault_url=keyvault_url, credential=credential)
+sql_server = client.get_secret("SQL-SERVER")
+sql_database = client.get_secret("SQL-DATABASE")
+sql_user = client.get_secret("SQL-USER")
+sql_password = client.get_secret("SQL-PASSWORD")
 
 jdbc_url = f"jdbc:sqlserver://{sql_server}.database.windows.net:1433;" \
            f"database={sql_database};" \
@@ -15,7 +19,7 @@ jdbc_url = f"jdbc:sqlserver://{sql_server}.database.windows.net:1433;" \
 
 
 # 1. Read the CSV file from Azure Data Lake Storage Gen2
-df = spark.read.option("header", True).csv("abfss://statements@datastorage39908.dfs.core.windows.net/transactions.csv")
+df = spark.read.option("header", True).csv("abfss://statements@datastorage28069.dfs.core.windows.net/transactions.csv")
 
 # 2. Convert column types
 df = df.withColumn("Reference", col("Reference").cast("long")) \
@@ -37,7 +41,7 @@ invalid_df = df.subtract(valid_df)
 invalid_df.select("Reference", "Description") \
           .write.mode("overwrite") \
           .option("header", True) \
-          .csv("abfss://statements@datastorage39908.dfs.core.windows.net/output/invalid")
+          .csv("abfss://statements@datastorage28069.dfs.core.windows.net/output/invalid")
 
 # (Optional) Display valid records
 valid_df.show()
