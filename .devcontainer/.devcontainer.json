@@ -1,12 +1,9 @@
-// For format details, see https://aka.ms/devcontainer.json.
 {
 	"name": "rabo-data",
 	"image": "mcr.microsoft.com/devcontainers/python:3.10-bullseye",
 
-	// See https://containers.dev/implementors/features/
 	"features": {
-		// terraform and az (required for auth) are installed by default
-        // See https://containers.dev/features for list of features
+
         "ghcr.io/devcontainers/features/azure-cli:1": {
         },
         "ghcr.io/devcontainers/features/terraform:1": {
@@ -15,11 +12,11 @@
 		"ghcr.io/azure/azure-dev/azd:latest": {}
     },
 
-	// Configure tool-specific properties.
+
 	"customizations": {
-		// Configure properties specific to VS Code.
+
 		"vscode": {
-			// Add the IDs of extensions you want installed when the container is created.
+
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
@@ -27,19 +24,16 @@
 				"ms-azuretools.azure-dev",
 				"hashicorp.terraform"
 			],
-			// Set *default* container specific settings.json values on container create.
+
 			"settings": { 
 				"python.defaultInterpreterPath": "/usr/local/bin/python"
 			}
 		}
 	},
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [5000, 50505],
+	"forwardPorts": [80, 8000],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "python3 -m pip install -r requirements.txt",
 
-	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }

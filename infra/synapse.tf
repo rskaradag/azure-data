@@ -16,8 +16,8 @@ resource "azurerm_synapse_workspace" "synapse_ws_rabo" {
   resource_group_name                  = azurerm_resource_group.rg_rabo.name
   location                             = azurerm_resource_group.rg_rabo.location
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.synapse_filesystem.id
-  sql_administrator_login              = var.synapse_sql_admin_username
-  sql_administrator_login_password     = var.synapse_sql_admin_password
+  sql_administrator_login              = var.synapseSQLAdminUsername
+  sql_administrator_login_password     = var.synapseSQLAdminPassword
 
   identity {
     type = "SystemAssigned"
@@ -61,6 +61,8 @@ EOF
 
   tags = merge(local.rg_tags)
 
+  depends_on = [azurerm_synapse_workspace.synapse_ws_rabo]
+
 }
 
 # ------------------------------------------------------------------------------------------------------
@@ -82,6 +84,11 @@ resource "azurerm_role_assignment" "synapse_storage_access" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
 }
+resource "azurerm_synapse_role_assignment" "synapse_contributor" {
+  synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
+  role_name            = "Synapse Contributor"
+  principal_id         = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
+}
 
 
 # ------------------------------------------------------------------------------------------------------
@@ -90,7 +97,8 @@ resource "azurerm_role_assignment" "synapse_storage_access" {
 resource "azurerm_synapse_firewall_rule" "fw_rule_rabo" {
   name                 = "AllowAll"
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
-  # will replaced by data.http.clientIp.response_body
-  start_ip_address     = trim(data.http.client_ip.response_body, "\n")
-  end_ip_address       = trim(data.http.client_ip.response_body, "\n")
+  # start_ip_address = trim(data.http.client_ip.response_body, "\n")
+  # end_ip_address   = trim(data.http.client_ip.response_body, "\n")
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 }

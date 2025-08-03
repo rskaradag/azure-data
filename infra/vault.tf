@@ -13,9 +13,9 @@ resource "azurerm_key_vault" "kv" {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
 
-    secret_permissions = ["Get", "List", "Set", "Delete", "Recover","Backup","Restore", "Purge"]
-    key_permissions = ["Get", "List", "Update", "Delete", "Recover","Create","GetRotationPolicy","SetRotationPolicy","Verify","Release","WrapKey","UnwrapKey","Decrypt","Encrypt"]
-    storage_permissions = ["Get", "List", "Set", "Delete", "Recover","RegenerateKey","Backup","Restore", "Purge"]
+    secret_permissions  = ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore", "Purge"]
+    key_permissions     = ["Get", "List", "Update", "Delete", "Recover", "Create", "GetRotationPolicy", "SetRotationPolicy", "Verify", "Release", "WrapKey", "UnwrapKey", "Decrypt", "Encrypt"]
+    storage_permissions = ["Get", "List", "Set", "Delete", "Recover", "RegenerateKey", "Backup", "Restore", "Purge"]
   }
 
   # This is the identity of the App Service within Azure Active Directory (Azure AD).
@@ -23,9 +23,7 @@ resource "azurerm_key_vault" "kv" {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = azurerm_linux_web_app.app_service_rabo.identity[0].principal_id
 
-    secret_permissions = ["Get", "List", "Set", "Delete", "Recover","Backup","Restore", "Purge"]
-    key_permissions = ["Get", "List", "Update", "Delete", "Recover","Create","GetRotationPolicy","SetRotationPolicy","Verify","Release","WrapKey","UnwrapKey","Decrypt","Encrypt"]
-    storage_permissions = ["Get", "List", "Set", "Delete", "Recover","RegenerateKey","Backup","Restore", "Purge"]
+    secret_permissions = ["Get", "List"]
   }
 
   # This is the identity of the Service Principal within Azure Active Directory (Azure AD).
@@ -35,10 +33,10 @@ resource "azurerm_key_vault" "kv" {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = data.azuread_client_config.current.object_id
 
-    secret_permissions = ["Get", "List", "Set", "Delete", "Recover","Backup","Restore", "Purge"]
-    key_permissions = ["Get", "List", "Update", "Delete", "Recover","Create","GetRotationPolicy","SetRotationPolicy","Verify","Release","WrapKey","UnwrapKey","Decrypt","Encrypt"]
-    storage_permissions = ["Get", "List", "Set", "Delete", "Recover","RegenerateKey","Backup","Restore", "Purge"]
- }
+    secret_permissions  = ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore", "Purge"]
+    key_permissions     = ["Get", "List", "Update", "Delete", "Recover", "Create", "GetRotationPolicy", "SetRotationPolicy", "Verify", "Release", "WrapKey", "UnwrapKey", "Decrypt", "Encrypt"]
+    storage_permissions = ["Get", "List", "Set", "Delete", "Recover", "RegenerateKey", "Backup", "Restore", "Purge"]
+  }
 
 }
 
@@ -47,24 +45,24 @@ resource "azurerm_key_vault" "kv" {
 # ------------------------------------------------------------------------------------------------------
 resource "azurerm_key_vault_secret" "sql_server" {
   name         = "SQL-SERVER"
-  value        = var.sqlserver_name
+  value        = var.SQLServerName
   key_vault_id = azurerm_key_vault.kv.id
 }
 
 resource "azurerm_key_vault_secret" "sql_db" {
   name         = "SQL-DATABASE"
-  value        = var.db_name
+  value        = var.SQLDBName
   key_vault_id = azurerm_key_vault.kv.id
 }
 
 resource "azurerm_key_vault_secret" "sql_user" {
   name         = "SQL-USER"
-  value        = var.sql_admin_username
+  value        = var.SQLAdminUsername
   key_vault_id = azurerm_key_vault.kv.id
 }
 
 resource "azurerm_key_vault_secret" "sql_pass" {
   name         = "SQL-PASSWORD"
-  value        = var.sql_admin_password
+  value        = var.SQLAdminPassword
   key_vault_id = azurerm_key_vault.kv.id
 }

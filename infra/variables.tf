@@ -16,23 +16,12 @@ variable "environment" {
   }
 }
 
-
-# GitHub Authentication
-# variable "githubToken" {
-#   # Set using environment variable TF_VAR_githubToken
-#   type        = string
-#   description = "Please enter a PAT or OAuth token for GitHub authentication."
-#   sensitive   = true
-# }
-
-
-
-variable "synapse_sql_admin_password" {
+variable "synapseSQLAdminPassword" {
   description = "Synapse SQL Server admin password"
   type        = string
   sensitive   = true
 }
-variable "synapse_sql_admin_username" {
+variable "synapseSQLAdminUsername" {
 
 }
 variable "synapseRepoRootFolder" {
@@ -42,26 +31,36 @@ variable "synapseRepoRootFolder" {
 
 
 
-variable "sql_admin_password" {
+variable "SQLAdminPassword" {
   description = "SQL Server admin password"
   type        = string
   sensitive   = true
 }
-variable "sql_admin_username" {
+variable "SQLAdminUsername" {
 
 }
-variable "sqlserver_name" {
+variable "SQLServerName" {
 
 }
-variable "db_name" {
+variable "SQLDBName" {
 
 }
 
-
-variable "app_command_line" {
-  description = "Command line to run the application"
+variable "containerRegistryName" {
+  description = "Name of the Azure Container Registry"
   type        = string
-  default     = "python3 -m app.py"
 }
 
+variable "restApiName" {
+  description = "Name of the REST API"
+  type        = string
+}
+variable "appServiceName" {
+  description = "Name of the Application Service"
+  type        = string
+}
 
+variable "servicePlanName" {
+  description = "Name of the App Service Plan"
+  type        = string
+}

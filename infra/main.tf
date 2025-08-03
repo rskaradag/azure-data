@@ -48,7 +48,7 @@ resource "azurerm_storage_account" "storage_rabo" {
 # ------------------------------------------------------------------------------------------------------
 resource "azurerm_storage_container" "container_rabo" {
   name                  = local.resourceNames.storageContainerName
-  storage_account_id  = azurerm_storage_account.storage_rabo.id
+  storage_account_id    = azurerm_storage_account.storage_rabo.id
   container_access_type = "private"
 }
 

@@ -16,7 +16,7 @@ else:
     app.logger.setLevel(logging.INFO)
 
 # Load Key Vault values
-vault_url = os.environ.get("KEYVAULT_URL") or "https://kv-rabo.vault.azure.net/"
+vault_url = os.environ.get("KEYVAULT_URL") or "https://kv-rabo.vault.azure.net/" 
 credential = DefaultAzureCredential()
 client = SecretClient(vault_url=vault_url, credential=credential)
 
@@ -33,9 +33,9 @@ conn_str = (
     f"PWD={sql_password}"
 )
 
-@app.route("/")
+@app.route("/heatlhcheck")
 def get_home():
-    result = [{"hellow": "world"}]
+    result = [{"hello": "world"}]
     return jsonify(result)
 
 @app.route("/invalids")

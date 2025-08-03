@@ -1,0 +1,27 @@
+FROM python:3.10-slim
+
+# Required to install pyodbc
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    unixodbc-dev \
+    libpq-dev \
+    curl \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Install required packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application files
+COPY . .
+
+# Port (optional)
+EXPOSE 8000
+
+# Run with Gunicorn for production
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
