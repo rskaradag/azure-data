@@ -69,10 +69,6 @@ resource "azurerm_linux_web_app" "app_service_rabo" {
 
   app_settings = {
     KEYVAULT_URL = "https://kv-rabo.vault.azure.net/"
-    SQL_SERVER   = "@Microsoft.KeyVault(SecretName=SQL-SERVER)"
-    SQL_DB       = "@Microsoft.KeyVault(SecretName=SQL-DB)"
-    SQL_USER     = "@Microsoft.KeyVault(SecretName=SQL-USER)"
-    SQL_PASSWORD = "@Microsoft.KeyVault(SecretName=SQL-PASSWORD)"
   }
 
   tags = merge(local.rg_tags)
@@ -91,5 +87,5 @@ resource "azurerm_linux_web_app" "app_service_rabo" {
 # }
 
 output "app_url" {
-  value = "https://${azurerm_linux_web_app.app_service_rabo.default_hostname}/heatlhcheck"
+  value = "https://${azurerm_linux_web_app.app_service_rabo.default_hostname}/healthcheck"
 }
