@@ -1,0 +1,4 @@
+Flask==3.0.3
+pyodbc
+azure-identity==1.23.1
+azure-keyvault-secrets==4.10.0
