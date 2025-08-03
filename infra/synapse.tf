@@ -65,10 +65,33 @@ EOF
 
 }
 
+resource "azurerm_synapse_integration_runtime_azure" "sqlserver_integration_runtime" {
+  name                 = "sqlserver-integration-runtime"
+  synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
+  location             = azurerm_resource_group.rg_rabo.location
+}
+
+resource "azurerm_synapse_linked_service" "sqlserver_linked_service" {
+  name                 = "sqlserver-linked-service"
+  synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
+  type                 = "SqlServer"
+  type_properties_json = <<JSON
+{
+  "connectionString": "Server=tcp:${azurerm_mssql_server.sql_server_rabo.fully_qualified_domain_name},1433;Database=${azurerm_mssql_database.sql_db_rabo.name};User ID=${var.SQLAdminUsername};Password=${var.SQLAdminPassword};Encrypt=true;TrustServerCertificate=false;Connection Timeout=30;"
+}
+JSON
+  integration_runtime {
+    name = azurerm_synapse_integration_runtime_azure.sqlserver_integration_runtime.name
+  }
+
+  depends_on = [
+    azurerm_synapse_firewall_rule.fw_rule_rabo
+  ]
+}
+
 # ------------------------------------------------------------------------------------------------------
 # Deploy Synapse Role Assignments
 # ------------------------------------------------------------------------------------------------------
-# Assign the Synapse Workspace the Contributor role on itself.
 # This allows the Synapse Workspace to manage its own resources.
 # The principal_id is obtained from the current Azure client configuration.
 resource "azurerm_synapse_role_assignment" "synapse_role_assignment_self" {
@@ -81,9 +104,11 @@ resource "azurerm_synapse_role_assignment" "synapse_role_assignment_self" {
 # This allows Synapse to read and write data to the Storage Account.
 resource "azurerm_role_assignment" "synapse_storage_access" {
   scope                = azurerm_storage_account.storage_rabo.id
-  role_definition_name = "Storage Blob Data Contributor"
+  role_definition_name = "Contributor"
   principal_id         = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
 }
+
+# Assign the Synapse Workspace the Contributor role on itself.
 resource "azurerm_synapse_role_assignment" "synapse_contributor" {
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
   role_name            = "Synapse Contributor"
@@ -102,3 +127,55 @@ resource "azurerm_synapse_firewall_rule" "fw_rule_rabo" {
   start_ip_address = "0.0.0.0"
   end_ip_address   = "255.255.255.255"
 }
+
+
+# ------------------------------------------------------------------------------------------------------
+# Deploy Synapse Pipeline
+# ------------------------------------------------------------------------------------------------------
+# resource "null_resource" "import_synapse_notebook" {
+#   triggers = {
+#     file_sha = filesha256("${path.module}/notebooks/Notebook.ipynb")
+#   }
+
+#   provisioner "local-exec" {
+#     command = <<EOT
+#       az synapse notebook import \
+#         --workspace-name ${azurerm_synapse_workspace.synapse_ws_rabo.name} \
+#         --name validate-csv \
+#         --file "${path.module}/notebooks/Notebook.ipynb" \
+#         --folder-path validation
+#     EOT
+#   }
+#   depends_on = [
+#     azurerm_synapse_workspace.synapse_ws_rabo,
+#     azurerm_synapse_spark_pool.spark_pool_rabo
+#   ]
+# }
+
+# resource "local_file" "rendered_pipeline" {
+#   content  = local.rendered_pipeline_json
+#   filename = "${path.module}/pipelines/rendered_pipeline.json"
+
+#   depends_on = [
+#     azurerm_synapse_workspace.synapse_ws_rabo,
+#     azurerm_synapse_spark_pool.spark_pool_rabo,
+#     null_resource.import_synapse_notebook
+#   ]
+# }
+
+# resource "null_resource" "deploy_synapse_pipeline" {
+#   triggers = {
+#     pipeline_hash = filesha256(local_file.rendered_pipeline.filename)
+#   }
+
+#   provisioner "local-exec" {
+#     command = <<EOT
+#       az synapse pipeline create \
+#         --workspace-name ${azurerm_synapse_workspace.synapse_ws_rabo.name} \
+#         --name validate-csv-pipeline \
+#         --file "${local_file.rendered_pipeline.filename}"
+#     EOT
+#   }
+
+#   depends_on = [local_file.rendered_pipeline]
+# }
