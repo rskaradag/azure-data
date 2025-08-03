@@ -19,7 +19,7 @@ jdbc_url = f"jdbc:sqlserver://{sql_server}.database.windows.net:1433;" \
 
 
 # 1. Read the CSV file from Azure Data Lake Storage Gen2
-df = spark.read.option("header", True).csv("abfss://statements@datastorage28069.dfs.core.windows.net/transactions.csv")
+df = spark.read.option("header", True).csv("abfss://cnt-rabodata-dev-northeurope@strabodatadevnortheurope.dfs.core.windows.net/transactions.csv")
 
 # 2. Convert column types
 df = df.withColumn("Reference", col("Reference").cast("long")) \
@@ -41,7 +41,7 @@ invalid_df = df.subtract(valid_df)
 invalid_df.select("Reference", "Description") \
           .write.mode("overwrite") \
           .option("header", True) \
-          .csv("abfss://statements@datastorage28069.dfs.core.windows.net/output/invalid")
+          .csv("abfss://cnt-rabodata-dev-northeurope@strabodatadevnortheurope.dfs.core.windows.net/output/invalid")
 
 # (Optional) Display valid records
 valid_df.show()
