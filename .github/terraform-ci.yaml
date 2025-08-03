@@ -1,0 +1,69 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    paths:
+      - 'api/**'
+      - 'infra/**'
+    branches:
+      - main
+
+  pull_request:
+    paths:
+      - 'api/**'
+      - 'infra/**'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which environment? (dev, staging, prod)'
+        required: true
+        default: 'dev'
+
+jobs:
+  terraform:
+    name: Terraform Plan & Apply
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+      TFVARS_FILE: ${{ format('tfvars/{0}.tfvars', github.event.inputs.environment || 'dev') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - name: Terraform Format Check
+        working-directory: ./infra
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        working-directory: ./infra
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ./infra
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ./infra
+        run: terraform plan -var-file="${{ env.TFVARS_FILE }}"
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        working-directory: ./infra
+        run: terraform apply -var-file="${{ env.TFVARS_FILE }}" -auto-approve
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
