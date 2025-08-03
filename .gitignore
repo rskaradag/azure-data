@@ -17,3 +17,6 @@ override.tf.json
 *.bak
 *.tmp
 .DS_Store
+
+venv/*
+*/venv/*
