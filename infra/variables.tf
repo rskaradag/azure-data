@@ -56,11 +56,25 @@ variable "restApiName" {
   type        = string
 }
 variable "appServiceName" {
-  description = "Name of the Application Service"
+  description = "Name of the Service Name"
   type        = string
 }
 
 variable "servicePlanName" {
   description = "Name of the App Service Plan"
   type        = string
+}
+
+
+variable "ARM_CLIENT_ID" {
+  type      = string
+  sensitive = true
+}
+variable "ARM_TENANT_ID" {
+  type      = string
+  sensitive = true
+}
+variable "ARM_CLIENT_SECRET" {
+  type      = string
+  sensitive = true
 }

@@ -29,6 +29,11 @@ resource "azurerm_synapse_workspace" "synapse_ws_rabo" {
 # ------------------------------------------------------------------------------------------------------
 # Deploy Spark Pool
 # ------------------------------------------------------------------------------------------------------
+# This Spark Pool is used for big data processing within the Synapse Workspace.
+# It is configured with auto-scaling and a library requirement for Python packages.
+# The Spark version is set to 3.4, which is compatible with the latest features and best practices.
+# The Spark pool will use the system-assigned managed identity for secure access to other Azure resources.
+# Environment variables for authentication are set in the spark_config for development purposes.
 resource "azurerm_synapse_spark_pool" "spark_pool_rabo" {
   name                 = local.resourceNames.synapseSparkPoolName
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
@@ -45,15 +50,20 @@ resource "azurerm_synapse_spark_pool" "spark_pool_rabo" {
   library_requirement {
     content  = <<EOF
 azure-identity==1.23.1
-azure-keyvault-secrets==4.10.0
+azure-keyvault-secrets==4.10.0 
 EOF
     filename = "requirements.txt"
   }
 
+  # The spark_config block is used to set environment variables for authentication.
+  # These variables are used by the Spark pool to authenticate with Azure services.
+  # The spark_config is for development purpose due to failure in DefaultAzureCredential() function in pyspark file.
   spark_config {
-    content  = <<EOF
-spark.shuffle.spill                true
-EOF
+    content = templatefile("${path.module}/templates/spark_config.tmpl", {
+      client_id     = var.ARM_CLIENT_ID
+      tenant_id     = var.ARM_TENANT_ID
+      client_secret = var.ARM_CLIENT_SECRET
+    })
     filename = "config.txt"
   }
 
@@ -65,6 +75,10 @@ EOF
 
 }
 
+# ------------------------------------------------------------------------------------------------------
+# Deploy Synapse Linked Service for SQL Server
+# ------------------------------------------------------------------------------------------------------
+# This linked service will not be used for data integration, but it is development purpose.
 resource "azurerm_synapse_integration_runtime_azure" "sqlserver_integration_runtime" {
   name                 = "sqlserver-integration-runtime"
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
@@ -92,7 +106,7 @@ JSON
 # ------------------------------------------------------------------------------------------------------
 # Deploy Synapse Role Assignments
 # ------------------------------------------------------------------------------------------------------
-# This allows the Synapse Workspace to manage its own resources.
+
 # The principal_id is obtained from the current Azure client configuration.
 resource "azurerm_synapse_role_assignment" "synapse_role_assignment_self" {
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
@@ -104,10 +118,11 @@ resource "azurerm_synapse_role_assignment" "synapse_role_assignment_self" {
 # This allows Synapse to read and write data to the Storage Account.
 resource "azurerm_role_assignment" "synapse_storage_access" {
   scope                = azurerm_storage_account.storage_rabo.id
-  role_definition_name = "Contributor"
+  role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
 }
 
+# This allows the Synapse Workspace to manage its own resources.
 # Assign the Synapse Workspace the Contributor role on itself.
 resource "azurerm_synapse_role_assignment" "synapse_contributor" {
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
@@ -119,6 +134,7 @@ resource "azurerm_synapse_role_assignment" "synapse_contributor" {
 # ------------------------------------------------------------------------------------------------------
 # Deploy Synapse Firewall Rule
 # ------------------------------------------------------------------------------------------------------
+# This firewall rule allows all IP addresses to access the Synapse Workspace for development purposes.
 resource "azurerm_synapse_firewall_rule" "fw_rule_rabo" {
   name                 = "AllowAll"
   synapse_workspace_id = azurerm_synapse_workspace.synapse_ws_rabo.id
@@ -132,9 +148,12 @@ resource "azurerm_synapse_firewall_rule" "fw_rule_rabo" {
 # ------------------------------------------------------------------------------------------------------
 # Deploy Synapse Pipeline
 # ------------------------------------------------------------------------------------------------------
+# This null resource imports a Synapse Notebook into the Synapse Workspace.
+# The notebook is used for validating records in the CSV file.
+# The Complete process is not tested yet, but it is expected to work.
 # resource "null_resource" "import_synapse_notebook" {
 #   triggers = {
-#     file_sha = filesha256("${path.module}/notebooks/Notebook.ipynb")
+#     file_sha = filesha256("${path.module}/notebooks/validate_records.ipynb")
 #   }
 
 #   provisioner "local-exec" {
@@ -142,7 +161,7 @@ resource "azurerm_synapse_firewall_rule" "fw_rule_rabo" {
 #       az synapse notebook import \
 #         --workspace-name ${azurerm_synapse_workspace.synapse_ws_rabo.name} \
 #         --name validate-csv \
-#         --file "${path.module}/notebooks/Notebook.ipynb" \
+#         --file "${path.module}/notebooks/validate_records.ipynb" \
 #         --folder-path validation
 #     EOT
 #   }

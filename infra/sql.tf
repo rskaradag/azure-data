@@ -16,7 +16,6 @@ resource "azurerm_mssql_server" "sql_server_rabo" {
 }
 
 # Create a SQL Database within the SQL Server. This is a basic setup.
-# For production, consider using a more robust configuration.
 resource "azurerm_mssql_database" "sql_db_rabo" {
   name           = var.SQLDBName
   server_id      = azurerm_mssql_server.sql_server_rabo.id
@@ -31,8 +30,8 @@ resource "azurerm_mssql_database" "sql_db_rabo" {
 
 # Allow local connections to the SQL Server. This is useful for development and testing. will be removed in production.
 resource "azurerm_mssql_firewall_rule" "fw_rule_mssql_rabo" {
-  name             = "AllowLocal"
-  server_id        = azurerm_mssql_server.sql_server_rabo.id
+  name      = "AllowLocal"
+  server_id = azurerm_mssql_server.sql_server_rabo.id
   # start_ip_address = trim(data.http.client_ip.response_body, "\n")
   # end_ip_address   = trim(data.http.client_ip.response_body, "\n")
   start_ip_address = "0.0.0.0"
