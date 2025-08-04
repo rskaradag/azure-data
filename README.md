@@ -10,7 +10,7 @@ This project implements an end-to-end data validation pipeline on Azure, leverag
 
 ---
 
-## 📉 Problem Statement
+## Problem Statement
 
 Rabo receives statement records in CSV format, These records must be:
 
@@ -21,7 +21,7 @@ Invalid records must be logged, and valid ones stored in a database. An API shou
 
 ---
 
-## 🔁 Workflow Summary
+## Workflow Summary
 
 1. **CSV Upload:** User uploads CSV to Storage Account (`transactions.csv`)
 2. **Synapse Spark Job:** Triggered via Synapse pipeline
@@ -35,7 +35,7 @@ Invalid records must be logged, and valid ones stored in a database. An API shou
 
 ---
 
-## 📊 Infrastructure (via Terraform)
+## Infrastructure (via Terraform)
 
 Provisioned using Terraform under `infra/`:
 
@@ -49,7 +49,7 @@ Provisioned using Terraform under `infra/`:
 
 ---
 
-## 🔐 Secrets & Identity Management
+## Secrets & Identity Management
 
 - **Key Vault** stores all SQL secrets: `SQL-SERVER`, `SQL-DB`, `SQL-USER`, `SQL-PASSWORD`
 - **Service Principal:** `terraform-sp-rabo` manages IaC
@@ -59,7 +59,7 @@ Provisioned using Terraform under `infra/`:
 
 ---
 
-## ✨ PySpark Validation Script
+## PySpark Validation Script
 
 Located in `notebooks/validate_records.py`. This script:
 
@@ -73,7 +73,7 @@ Located in `notebooks/validate_records.py`. This script:
 
 ---
 
-## 🚀 API Component
+## API Component
 
 - Folder: `api/`
 - Language: Python (Flask)
@@ -84,7 +84,7 @@ Located in `notebooks/validate_records.py`. This script:
 
 ---
 
-## ♻️ CI/CD (GitHub Actions)
+## CI/CD (GitHub Actions)
 
 - Triggered on push to `infra/` or `api/`
 - Path: `.github/workflows/terraform-ci.yml`
@@ -98,7 +98,7 @@ Located in `notebooks/validate_records.py`. This script:
 
 ---
 
-## 📅 Project Structure
+## Project Structure
 
 ```
 .
@@ -142,7 +142,7 @@ Located in `notebooks/validate_records.py`. This script:
 
 ---
 
-## 🔢 API Testing Example
+## API Testing Example
 
 ```bash
 curl https://rabo-exporter.azurewebsites.net/invalid
@@ -150,7 +150,7 @@ curl https://rabo-exporter.azurewebsites.net/invalid
 
 ---
 
-## 📊 Requirements
+## Requirements
 
 - Terraform >= 1.8.0
 - Azure CLI logged in
