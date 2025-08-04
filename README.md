@@ -30,7 +30,7 @@ Invalid records must be logged, and valid ones stored in a database. An API shou
    - End balance formula check
 4. **Result:**
    - Valid records → SQL Database
-   - Invalid records → Storage + API output
+   - Invalid records → SQL Database + API output
 5. **API:** Flask app exposes failed records via REST endpoint
 
 ---
@@ -41,7 +41,7 @@ Provisioned using Terraform under `infra/`:
 
 - **Azure Storage Account** (CSV & output)
 - **Azure Synapse Workspace + Spark Pool** (Validation)
-- **Azure SQL Server + Database** (Valid rows)
+- **Azure SQL Server + Database** (Valid & Invalid rows)
 - **Azure Key Vault** (Secrets like SQL credentials)
 - **Azure App Service (Linux)** (Python API)
 - **Azure Container Registry** (Holds API Docker image)
@@ -80,7 +80,7 @@ Located in `notebooks/validate_records.py`. This script:
 - Containerized with Docker
 - Fetches SQL credentials from Key Vault at runtime using `DefaultAzureCredential`
 - Exposes:
-  - `/api/invalid-records` endpoint returning JSON of invalid rows
+  - `/invalid` endpoint returning JSON of invalid rows
 
 ---
 
@@ -102,23 +102,42 @@ Located in `notebooks/validate_records.py`. This script:
 
 ```
 .
-├── api/                         # Flask API
-│   ├── app.py
-│   ├── requirements.txt
-│   └── Dockerfile
-├── infra/                       # Terraform infrastructure
-│   ├── main.tf
-│   ├── synapse.tf
-│   ├── api.tf
-│   ├── variables.tf
-│   └── tfvars/
-│       ├── dev.tfvars
-│       └── prod.tfvars
-├── notebooks/                   # PySpark notebook scripts
-│   └── validate_records.py
-└── .github/
-    └── workflows/
-        └── terraform-ci.yml
+.
+├── api
+│   ├── app.py
+│   ├── dockerfile
+│   ├── requirements.txt
+├── docs
+│   └── rabodesign.png
+├── infra
+│   ├── api.tf
+│   ├── app.zip
+│   ├── data
+│   │   └── records.csv
+│   ├── main.tf
+│   ├── naming.tf
+│   ├── notebooks
+│   │   └── validate_records.ipynb
+│   ├── pipelines
+│   │   └── validate_pipeline.json.tpl
+│   ├── pyspark
+│   │   └── validate_records.py
+│   ├── provider.tf
+│   ├── outputs.tf
+│   ├── resourceNames.tf
+│   ├── sql.tf
+│   ├── synapse.tf
+│   ├── tags.tf
+│   ├── templates
+│   │   └── spark_config.tmpl
+│   ├── tfvars
+│   │   └── dev.tfvars
+│   ├── variables.tf
+│   └── vault.tf
+├── README.md
+├── requirements.txt
+
+
 ```
 
 ---

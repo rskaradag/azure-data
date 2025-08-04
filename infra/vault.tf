@@ -16,9 +16,8 @@ resource "azurerm_key_vault" "kv" {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
 
-    secret_permissions  = ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore", "Purge"]
-    key_permissions     = ["Get", "List", "Update", "Delete", "Recover", "Create", "GetRotationPolicy", "SetRotationPolicy", "Verify", "Release", "WrapKey", "UnwrapKey", "Decrypt", "Encrypt"]
-    storage_permissions = ["Get", "List", "Set", "Delete", "Recover", "RegenerateKey", "Backup", "Restore", "Purge"]
+    secret_permissions = ["Get", "List"]
+    key_permissions = ["Get", "List"]
   }
 
 
@@ -28,6 +27,7 @@ resource "azurerm_key_vault" "kv" {
     object_id = azurerm_linux_web_app.app_service_rabo.identity[0].principal_id
 
     secret_permissions = ["Get", "List"]
+    key_permissions = ["Get", "List"]
   }
 
   # This is the identity of the Service Principal within Azure Active Directory (Azure AD).
