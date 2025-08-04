@@ -12,8 +12,8 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 else:
-    logging.basicConfig(level=logging.INFO)
-    app.logger.setLevel(logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
+    app.logger.setLevel(logging.DEBUG)
 
 # Load Key Vault values
 vault_url = os.environ.get("KEYVAULT_URL") or "https://kv-rabo.vault.azure.net/" 
@@ -33,20 +33,38 @@ conn_str = (
     f"PWD={sql_password}"
 )
 
-@app.route("/heatlhcheck")
+@app.route("/healthcheck")
 def get_home():
     result = [{"hello": "world"}]
     return jsonify(result)
 
-@app.route("/invalids")
-def get_invalids():
+@app.route("/invalid")
+def get_invalid():
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
     cursor.execute("SELECT Reference, Description FROM InvalidTransactions")
     rows = cursor.fetchall()
+
+    if not rows:
+        return jsonify({"message": "No Invalid transactions found yet."}), 200
+
+    result = [{"reference": r[0], "description": r[1]} for r in rows]
+    return jsonify(result)
+
+@app.route("/valid")
+def get_valid():
+    conn = pyodbc.connect(conn_str)
+    cursor = conn.cursor()
+    cursor.execute("SELECT Reference, Description FROM ValidTransactions")
+    rows = cursor.fetchall()
+
+    if not rows:
+        return jsonify({"message": "No valid transactions found yet."}), 200
+
     result = [{"reference": r[0], "description": r[1]} for r in rows]
     return jsonify(result)
 
 if __name__ == "__main__":
     app.run()
     app.logger.info("Starting Flask app")
+
