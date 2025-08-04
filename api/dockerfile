@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Port (optional)
-EXPOSE 8000
+EXPOSE 80
 
 # Run with Gunicorn for production
 CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
