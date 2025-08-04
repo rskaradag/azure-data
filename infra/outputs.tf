@@ -9,3 +9,7 @@ output "synapse_workspace_name" {
 output "synapse_identity" {
   value = azurerm_synapse_workspace.synapse_ws_rabo.identity[0].principal_id
 }
+
+output "app_url" {
+  value = "https://${azurerm_linux_web_app.app_service_rabo.default_hostname}/healthcheck"
+}
