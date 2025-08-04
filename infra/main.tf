@@ -59,12 +59,11 @@ resource "azurerm_storage_container" "container_rabo" {
 resource "azurerm_role_assignment" "role_assignment_service_principal" {
   scope                = azurerm_storage_account.storage_rabo.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = data.azurerm_client_config.current.object_id
+  principal_id         = data.azuread_client_config.current.object_id
 }
 
 # This null resource uploads a CSV file to the storage account container.
 # It uses the Azure CLI to upload the file, which is useful for development and testing.
-# In production, consider using a more robust solution for data ingestion.
 resource "null_resource" "upload_csv" {
   provisioner "local-exec" {
     command = <<EOT
