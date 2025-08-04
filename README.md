@@ -6,7 +6,7 @@ This project implements an end-to-end data validation pipeline on Azure, leverag
 
 ## 🗍 Architecture Diagram
 
-Add diagram here: `https://github.com/rskaradag/azure-data/blob/main/docs/rabodesign.png`
+Add diagram here: `https://github.com/rskaradag/azure-data/blob/main/rabodesign.png`
 
 ---
 
